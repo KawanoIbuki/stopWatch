@@ -23,8 +23,8 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-      M5.update();
-      if (M5.BtnA.wasPressed())
+  M5.update();
+  if (M5.BtnA.wasPressed())
   {
     startCheck = 1;
   }
