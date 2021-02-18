@@ -5,7 +5,7 @@
 #define BUTTON_ON 0
 #define BUTTON_OFF 1
 int secondCount = 0, minCount = 0, startCheck = 0, minRap = 0, secondRap = 0;
-
+bool Speedmetor = false,Raptimer = true;
 void setup() {
   // put your setup code here, to run once:
   M5.begin();
@@ -24,27 +24,51 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   M5.update();
-  if (M5.BtnA.wasPressed()) {
-    while (1) {
-      M5.Lcd.setCursor(10, 10);
-      M5.Lcd.printf("%d:%d", minCount, secondCount);
-      //int %d float %f
-      secondCount++;
-      if (secondCount == 60) {
-        secondCount = 0;
-        minCount++;
+  if(M5.BtnA.wasPressed() && !Raptimer){
+    Raptimer = true;
+    Speedmetor = false;
+    M5.Lcd.fillScreen(BLACK);
+  }
+  if(M5.BtnC.wasPressed() && !Speedmetor){
+    Raptimer = false;
+    Speedmetor = true;
+    M5.Lcd.fillScreen(BLACK);
+  }
+  if(Speedmetor){
+    M5.Lcd.printf("Speedmetor");
+  }
+  if(Raptimer){
+    M5.Lcd.setCursor(10, 10);
+    M5.Lcd.printf("%d:%d", minCount, secondCount);
+    M5.update();
+    if (M5.BtnA.wasPressed() && Raptimer) {
+      while (Raptimer) {
+        M5.Lcd.setCursor(10, 10);
+        M5.Lcd.printf("%d:%d", minCount, secondCount);
+        //int %d float %f
+        secondCount++;
+        if (secondCount == 60) {
+          secondCount = 0;
+          minCount++;
+        }
+        M5.update();
+        
+        if (M5.BtnB.wasPressed()) {
+  
+          minRap = minCount;
+          secondRap = secondCount;
+  
+        }
+        M5.Lcd.setCursor(30, 30);
+        M5.Lcd.printf("%d:%d", minRap, secondRap);
+        //delay(1000);
+        M5.Lcd.fillScreen(BLACK);
+        if(M5.BtnC.wasPressed() && !Speedmetor){
+          Raptimer = false;
+          Speedmetor = true;
+          M5.Lcd.fillScreen(BLACK);
+        }
       }
-      M5.update();
-      if (M5.BtnB.wasPressed()) {
-
-        minRap = minCount;
-        secondRap = secondCount;
-
-      }
-      M5.Lcd.setCursor(30, 30);
-      M5.Lcd.printf("%d:%d", minRap, secondRap);
-      //delay(1000);
-      M5.Lcd.fillScreen(BLACK);
     }
   }
 }
