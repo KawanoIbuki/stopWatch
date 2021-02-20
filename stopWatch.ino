@@ -75,9 +75,9 @@ void loop() {
     M5.Lcd.printf("START");
   }
 
-  if (M5.BtnA.wasPressed()) StartRapTimer = true;
-  if(StartRapTimer){
-    ticker.once(1,countupTimer);
+  if (M5.BtnA.wasPressed()){
+    StartRapTimer = true;
+    ticker.attach(1,countupTimer);
   }
   
   if (M5.BtnB.wasPressed()) {
