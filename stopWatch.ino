@@ -1,9 +1,9 @@
 #include <M5Stack.h>
 #include <Ticker.h>
 
-//timer
-Ticker ticker;
+Ticker tickerTime;
 
+//timer
 unsigned int secondCount = 0;
 unsigned int minCount = 0;
 unsigned int startCheck = 0;
@@ -26,7 +26,7 @@ void writeData(int rapCount, int minRap, int secondRap) {
 
 void countupTimer() {
   M5.Lcd.fillScreen(BLACK);
-
+  tickerTime.attach_ms(1000, setPin, 0);
   //timer mode
   while (1) {
     //init
@@ -88,9 +88,10 @@ void loop() {
 
   M5.Lcd.setCursor(10, 10);
   M5.Lcd.printf("Press A button to start rap system");
+
+  //start timer
   M5.Lcd.setCursor(20, 200);
   M5.Lcd.printf("START");
-
   if (M5.BtnA.wasPressed()) countupTimer();
 
 } //end of loop()
