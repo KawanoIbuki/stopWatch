@@ -1,6 +1,15 @@
 #include <M5Stack.h>
 #include <Ticker.h>
 
+#define ZERO 0
+#define WIDTH 320
+#define HEIGHT 235
+#define DISPLAY_HEIGHT 190
+#define MANU_HEIGHT 45
+
+#define BUTTON_Y 180
+
+Ticker tickerTime1;
 Ticker tickerTime;
 
 //timer
@@ -34,46 +43,53 @@ void countUp() {
 void rapTime() {
   rapCount++;
 
-  minRap = (msCount / 60000) % 3600;
-  secondRap = (msCount / 1000) % 60;
-  msRap = msCount & 1000;
+  minRap = (msCount / 6000) % 3600;
+  secondRap = (msCount / 100) % 60;
+  msRap = msCount & 100;
 
   //write data to csv file
   writeData(rapCount, minRap, secondRap, msRap);
+
+  //print rap time
+  M5.Lcd.fillRect(40, 100, 250, 25, BLUE);
+  M5.Lcd.setCursor(40, 100);
+  M5.Lcd.setTextSize(3);
+  M5.Lcd.printf("%2d - %2d:%2d.%2d", rapCount, minRap, secondRap, msRap);
+
 }
 void Timer() {
-  M5.Lcd.fillScreen(BLACK);
-  tickerTime.attach_ms(1, countUp);
+  M5.Lcd.fillRoundRect(0, 0, WIDTH, DISPLAY_HEIGHT, 10, BLUE);  //x, y, width, height
+  M5.Lcd.fillTriangle(50, DISPLAY_HEIGHT + 10, 50, DISPLAY_HEIGHT + 40, 80, DISPLAY_HEIGHT + 25, 0x000F);
+  tickerTime.attach_ms(10, countUp);
 
   //timer mode
   while (1) {
     //init
     M5.update();
-    M5.Lcd.fillScreen(BLACK);
 
     //save rap time
     M5.Lcd.setCursor(140, 200);
+    M5.Lcd.setTextSize(3);
     M5.Lcd.printf("RAP");
     if (M5.BtnB.wasPressed()) {
       rapTime();
     } //end of if
 
-    //print time
+    //main print time
+    M5.Lcd.fillRect(10, 10, 290, 50, RED);
+    M5.Lcd.setTextSize(6);
     M5.Lcd.setCursor(10, 10);
-    M5.Lcd.printf("Time: %2d:%2d.%3d", (msCount / 60000) % 3600, (msCount / 1000) % 60, msCount % 1000);
-    M5.Lcd.setCursor(10, 50);
-    M5.Lcd.printf("%10d", msCount);
-
-    //print rap time
-    M5.Lcd.setCursor(40, 100);
-    M5.Lcd.printf("%d - %d:%d.%d", rapCount, minRap, secondRap, msRap);
+    M5.Lcd.printf("%2d:%2d.%2d", (msCount / 6000) % 3600, (msCount / 100) % 60, msCount % 100);
+    //debag
+    // M5.Lcd.setCursor(10, 50);
+    // M5.Lcd.printf("%10d", msCount);
 
     //Quit (return to loop())
     M5.Lcd.setCursor(220, 200);
+    M5.Lcd.setTextSize(3);
     M5.Lcd.printf("Quit");
     if (M5.BtnC.wasPressed()) {
       M5.Power.reset();
-      M5.Lcd.fillScreen(BLACK);
       return;
     }
   } //end of while (1)
@@ -82,9 +98,18 @@ void Timer() {
 void setup() {
   M5.begin();
 
-  M5.Lcd.fillScreen(BLACK);
-  M5.Lcd.setTextColor(WHITE);
-  M5.Lcd.setTextSize(3);
+  M5.Lcd.fillScreen(BLACK);   //background color
+  M5.Lcd.setTextColor(GREEN);   //text color (RGBの中で一番明るく見えるため)
+
+  /*
+    M5.Lcd.drawFastVLine(2, 2, 230, 0xFD20); //left
+    M5.Lcd.drawFastHLine(2, 2, 319, 0xFD20); //top
+    M5.Lcd.drawFastVLine(319, 2, 230, 0xFD20); //right
+    M5.Lcd.drawFastHLine(2, 230, 319, 0xFD20); //bottom
+  */
+  //M5.Lcd.drawRect(0, 0, WIDTH, HEIGHT, BLUE);  //x, y, width, height
+
+  M5.Lcd.fillRoundRect(0, 0, WIDTH, DISPLAY_HEIGHT, 10, RED);  //x, y, width, height
 
   file = SD.open(fname, FILE_APPEND);
   file.println("number,min,second,msRap");
@@ -94,12 +119,18 @@ void setup() {
 void loop() {
   M5.update();
 
-  M5.Lcd.setCursor(10, 10);
-  M5.Lcd.printf("Press A button to start rap system");
+  M5.Lcd.setTextSize(6);
+  M5.Lcd.setCursor(20, 20);
+  M5.Lcd.printf("RapTimer");
+
+  M5.Lcd.setTextSize(2);
+  M5.Lcd.setCursor(75, 100);
+  M5.Lcd.printf("Press button to");
+  M5.Lcd.setCursor(70, 130);
+  M5.Lcd.printf("start stop watch");
 
   //start timer
-  M5.Lcd.setCursor(20, 200);
-  M5.Lcd.printf("START");
+  M5.Lcd.fillTriangle(50, DISPLAY_HEIGHT + 10, 50, DISPLAY_HEIGHT + 40, 80, DISPLAY_HEIGHT + 25, BLUE); //(x1, y1), (x2,y2), (x3, y3)
   if (M5.BtnA.wasPressed()) Timer();
 
 } //end of loop()
