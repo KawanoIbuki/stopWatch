@@ -10,7 +10,7 @@ unsigned int startCheck = 0;
 unsigned int minRap = 0;
 unsigned int secondRap = 0;
 unsigned int rapCount = 0;
-
+bool StartRapTimer = false;
 //sd setting
 unsigned int auiSize = 0;
 unsigned int auiCnt = 0;
@@ -26,49 +26,32 @@ void writeData(int rapCount, int minRap, int secondRap) {
 
 void countupTimer() {
   M5.Lcd.fillScreen(BLACK);
+//timer mode
+  //init
+  M5.update();
+  //carry
+  if (secondCount == 60) {
+    secondCount = 0;
+    minCount++;
+  } //end of if
 
-  //timer mode
-  while (1) {
-    //init
-    M5.update();
-    M5.Lcd.fillScreen(BLACK);
+  //save rap time
+  M5.Lcd.setCursor(140, 200);
+  M5.Lcd.printf("RAP");
 
-    //carry
-    if (secondCount == 60) {
-      secondCount = 0;
-      minCount++;
-    } //end of if
+  //print time
+  M5.Lcd.setCursor(10, 10);
+  M5.Lcd.printf("%d:%d", minCount, secondCount);
+  // ticker.attach(1, printMillis);
 
-    //save rap time
-    M5.Lcd.setCursor(140, 200);
-    M5.Lcd.printf("RAP");
-    if (M5.BtnB.wasPressed()) {
-      minRap = minCount;
-      secondRap = secondCount;
-      rapCount++;
-      writeData(rapCount, minRap, secondRap);
-    } //end of if
+  //print rap time
+  M5.Lcd.setCursor(130, 130);
+  M5.Lcd.printf("%d - %d:%d", rapCount, minRap, secondRap);
 
-    //print time
-    M5.Lcd.setCursor(10, 10);
-    M5.Lcd.printf("%d:%d", minCount, secondCount);
-    // ticker.attach(1, printMillis);
-
-    //print rap time
-    M5.Lcd.setCursor(130, 130);
-    M5.Lcd.printf("%d - %d:%d", rapCount, minRap, secondRap);
-
-    //Quit (return to loop())
-    M5.Lcd.setCursor(230, 200);
-    M5.Lcd.printf("Quit");
-    if (M5.BtnC.wasPressed()) {
-      M5.Lcd.fillScreen(BLACK);
-      return;
-    }
-    secondCount++;
-    millis(1000);
-
-  } //end of while (1)
+  //Quit (return to loop())
+  M5.Lcd.setCursor(230, 200);
+  M5.Lcd.printf("Quit");
+  secondCount++;
 }
 
 void setup() {
@@ -85,12 +68,28 @@ void setup() {
 
 void loop() {
   M5.update();
+  if(!StartRapTimer){
+    M5.Lcd.setCursor(10, 10);
+    M5.Lcd.printf("Press A button to start rap system");
+    M5.Lcd.setCursor(20, 200);
+    M5.Lcd.printf("START");
+  }
 
-  M5.Lcd.setCursor(10, 10);
-  M5.Lcd.printf("Press A button to start rap system");
-  M5.Lcd.setCursor(20, 200);
-  M5.Lcd.printf("START");
-
-  if (M5.BtnA.wasPressed()) countupTimer();
+  if (M5.BtnA.wasPressed()) StartRapTimer = true;
+  if(StartRapTimer){
+    ticker.once(1,countupTimer);
+  }
+  
+  if (M5.BtnB.wasPressed()) {
+    minRap = minCount;
+    secondRap = secondCount;
+    rapCount++;
+    writeData(rapCount, minRap, secondRap);
+  } //end of if
+  
+  if (M5.BtnC.wasPressed()) {
+    M5.Lcd.fillScreen(BLACK);
+    StartRapTimer = false;
+  }
 
 } //end of loop()
