@@ -7,10 +7,11 @@ Ticker tickerTime;
 unsigned int msCount = 0;
 unsigned int secondCount = 0;
 unsigned int minCount = 0;
-unsigned int startCheck = 0;
+
 unsigned int minRap = 0;
 unsigned int secondRap = 0;
 unsigned int msRap = 0;
+
 unsigned int rapCount = 0;
 
 //sd setting
