@@ -9,7 +9,6 @@
 
 #define BUTTON_Y 180
 
-Ticker tickerTime1;
 Ticker tickerTime;
 
 //timer
@@ -51,15 +50,18 @@ void rapTime() {
   writeData(rapCount, minRap, secondRap, msRap);
 
   //print rap time
-  M5.Lcd.fillRect(40, 100, 250, 25, BLUE);
+  M5.Lcd.fillRect(40, 100, 250, 25, 0x000F);
   M5.Lcd.setCursor(40, 100);
   M5.Lcd.setTextSize(3);
   M5.Lcd.printf("%2d - %2d:%2d.%2d", rapCount, minRap, secondRap, msRap);
 
 }
 void Timer() {
-  M5.Lcd.fillRoundRect(0, 0, WIDTH, DISPLAY_HEIGHT, 10, BLUE);  //x, y, width, height
+  //button icon
+  M5.Lcd.fillRoundRect(0, 0, WIDTH, DISPLAY_HEIGHT, 10, 0x000F);  //x, y, width, height
   M5.Lcd.fillTriangle(50, DISPLAY_HEIGHT + 10, 50, DISPLAY_HEIGHT + 40, 80, DISPLAY_HEIGHT + 25, 0x000F);
+
+  //10ms exec
   tickerTime.attach_ms(10, countUp);
 
   //timer mode
@@ -76,7 +78,7 @@ void Timer() {
     } //end of if
 
     //main print time
-    M5.Lcd.fillRect(10, 10, 290, 50, RED);
+    M5.Lcd.fillRect(10, 10, 290, 50, 0x000F);
     M5.Lcd.setTextSize(6);
     M5.Lcd.setCursor(10, 10);
     M5.Lcd.printf("%2d:%2d.%2d", (msCount / 6000) % 3600, (msCount / 100) % 60, msCount % 100);
@@ -91,12 +93,19 @@ void Timer() {
     if (M5.BtnC.wasPressed()) {
       M5.Power.reset();
       return;
-    }
+    } //end of if (M5.BtnC.wasPressed())
+
   } //end of while (1)
+
 }
 
 void setup() {
   M5.begin();
+
+  //data explain
+  file = SD.open(fname, FILE_APPEND);
+  file.println("number,min,second,msRap");
+  file.close();
 
   M5.Lcd.fillScreen(BLACK);   //background color
   M5.Lcd.setTextColor(GREEN);   //text color (RGBの中で一番明るく見えるため)
@@ -109,11 +118,7 @@ void setup() {
   */
   //M5.Lcd.drawRect(0, 0, WIDTH, HEIGHT, BLUE);  //x, y, width, height
 
-  M5.Lcd.fillRoundRect(0, 0, WIDTH, DISPLAY_HEIGHT, 10, RED);  //x, y, width, height
-
-  file = SD.open(fname, FILE_APPEND);
-  file.println("number,min,second,msRap");
-  file.close();
+  M5.Lcd.fillRoundRect(0, 0, WIDTH, DISPLAY_HEIGHT, 10, 0x000F);  //x, y, width, height
 }
 
 void loop() {
